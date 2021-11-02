@@ -3,6 +3,11 @@
 
 `constants.py`来自[wttr.in](https://github.com/chubin/wttr.in), 未作任何修改。
 
+## DEMO
+
+![kindle-monitor.png](https://test.yxyy.top/kindle-monitor.png)
+为什么是反的？因为我推荐把kindle倒置以便于充电。
+
 ## HOW TO USE?
 
 ### 普通用户
