@@ -1,0 +1,10 @@
+{
+	"items": [
+		{
+			"name": "Start monitor",
+			"priority": 1,
+			"action": "setsid ./start.sh",
+			"param": ""
+		}
+	]
+}
