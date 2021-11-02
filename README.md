@@ -25,9 +25,11 @@
 ## Geeks
 1. Clone本仓库
 2. `pip install PIL requeses feedparser qrcode`
-3. `python kindle-monitor-pillow.py`
-4. 将同一目录下生成的`kindle-monitor.png`拷贝至web服务器的目录下。
-5. 修改`kindle-monitor/run.sh`中的`uri`变量。
+3. 下载两份字体，放置到仓库目录下。一份应当有中文支持，另一份应当有Emoji支持。（推荐使用[霞鹜文楷](https://github.com/lxgw/LxgwWenKai)和![Twitter Color Emoji SVGinOT Font](https://github.com/eosrei/twemoji-color-font)）
+4. 修改`kindle-monitor-pillow.py`中的`fontFile`和`emojiFontFile`变量。
+5. `python kindle-monitor-pillow.py`
+6. 将同一目录下生成的`kindle-monitor.png`拷贝至web服务器的目录下。
+7. 修改`kindle-monitor/run.sh`中的`uri`变量。
 
 # License
 [Apache License 2.0](https://github.com/chubin/wttr.in/blob/master/LICENSE)
