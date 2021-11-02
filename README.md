@@ -6,7 +6,12 @@
 ## DEMO
 
 ![kindle-monitor.png](https://test.yxyy.top/kindle-monitor.png)
+
 为什么是反的？因为我推荐把kindle倒置以便于充电。
+
+![](https://raw.githubusercontent.com/Xuyiyang23333/kindle-clock/main/%E5%AE%9E%E9%99%85%E6%95%88%E6%9E%9C.jpg)
+
+实机演示。
 
 ## HOW TO USE?
 
