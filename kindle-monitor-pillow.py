@@ -1,12 +1,14 @@
 import time, requests, feedparser, qrcode
 from PIL import Image, ImageDraw, ImageFont
+from constants import WWO_CODE, WEATHER_SYMBOL
 
 #value
 SCREEN_W, SCREEN_H = 758, 1024
 blank = 20
 thick = 5
-seniversePK = '' #心知天气API私钥
-fontFile = ""
+fontFile = "LXGWWenKai-Regular.ttf"
+emojiFontFile = 'TwitterColorEmoji-SVGinOT.ttf'
+location = 'Shanghai'
 
 def show_time(hour, minite):
     ampm = ampmList[hour // 12]
@@ -30,6 +32,16 @@ def show_txt(img, text, size, x, y):
     textImg = textImg.resize((w, h), resample=Image.ANTIALIAS)
     img.alpha_composite(textImg, (x - (x_offset // AA), y - (y_offset // AA)))
 
+def show_emoji(img, text, size, x, y):
+    AA = 4 #抗锯齿
+    font = ImageFont.truetype(emojiFontFile, size * AA)
+    w, h = font.getsize(text)
+    textImg = Image.new('RGBA', (w * AA, h * AA), (255, 255, 255, 0))
+    drawText = ImageDraw.Draw(textImg)
+    drawText.text([0, h // 15], text, (0, 0, 0, 255), font)
+    textImg = textImg.resize((w, h), resample=Image.ANTIALIAS)
+    img.alpha_composite(textImg, (x, y))
+
 def date(year, month, day, weekday):
     chsWeekday = chsWeekdayList[weekday]
     return str(year) + '年' + str(month) + '月' + str(day) + '日 星期' + chsWeekday
@@ -38,12 +50,13 @@ def center(text, size, width = SCREEN_W):
     return (width - (len(text) * size)) // 2
 
 def weather(location):
-    r = requests.get('https://api.seniverse.com/v3/weather/now.json?key=' + seniversePK + '&location=' + location + '&language=zh-Hans&unit=c')
-    temp = r.json()['results'][0]['now']['temperature']
-    stat = r.json()['results'][0]['now']['text']
-    code = r.json()['results'][0]['now']['code']
-    loc = r.json()['results'][0]['location']['name']
-    return(temp, stat, loc, code)
+    r = requests.get('https://wttr.in/' + location + '?format=j2&lang=zh')
+    temp = r.json()['current_condition'][0]['temp_C']
+    code = r.json()['current_condition'][0]['weatherCode']
+    stat = WWO_CODE[code]
+    stat_zh = r.json()['current_condition'][0]['lang_zh'][0]['value']
+    loc = r.json()['nearest_area'][0]['areaName'][0]['value']
+    return(temp, stat, stat_zh, loc)
 
 def poem(type):
     r = requests.get('https://v1.jinrishici.com/' + type + '.json')
@@ -52,6 +65,8 @@ def poem(type):
     return content, author
 
 def new_line_show_txt(img, text, size, x, y):
+    if len(text) >= 28:
+        text = text[:26] + '……'
     #根据字数换行
     newText = text[:7]
     lineCnt = 1
@@ -61,19 +76,6 @@ def new_line_show_txt(img, text, size, x, y):
             lineCnt += 1
     AA = 4 #抗锯齿
     font = ImageFont.truetype(fontFile, size * AA)
-    '''
-    lineCnt, width, nlFlag = 1, 0, 0
-    newText = ''
-    for i in range(len(text)): #根据像素数判断是否换行
-        w, h = font.getsize(text[i])
-        width += w
-        if width >= 7 * size * AA - 80:
-            newText = newText + text[nlFlag:i] + '\n'
-            nlFlag = i
-            width = 0
-            lineCnt += 1
-    newText = newText + text[nlFlag:]
-    '''
     x_offset, y_offset = font.getoffset(newText)
     w, h = 7 * size, lineCnt * size
     textImg = Image.new('RGBA', (w * AA, h * AA), (255, 255, 255, 0))
@@ -119,13 +121,12 @@ show_txt(img, culueTime, 64, center(culueTime, 64), 100)
 show_txt(img, date, 36, 190, 170)
 
 #show weather
-temp, stat, loc, code = weather('shanghai')
-weatherImg = Image.open('weather-icons/' + code + '.png')
-weatherImg = weatherImg.resize((200, 200), resample=Image.ANTIALIAS)
-show_txt(img, loc + '天气', 48, center(loc + '天气', 48, SCREEN_W // 2), 260)
+temp, stat, stat_zh, loc = weather(location)
+icon = WEATHER_SYMBOL[stat]
+show_txt(img, '天气', 48, center('天气', 48, SCREEN_W // 2), 260)
 show_txt(img, str(temp) + '℃', 64, center(temp, 64, SCREEN_W // 2), 330)
-show_txt(img, stat, 72, center(stat, 72, SCREEN_W // 2), 420)
-img.alpha_composite(weatherImg, (center('空', 200, SCREEN_W // 2), 500))
+show_txt(img, stat_zh, 72, center(stat_zh, 72, SCREEN_W // 2), 420)
+show_emoji(img, icon, 200, center('空', 200, SCREEN_W // 2), 500)
 
 #show poem
 content, author = poem('all')
